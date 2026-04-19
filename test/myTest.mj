@@ -1,0 +1,32 @@
+program ABC
+const int a = true, b = 'a';
+double c, d[];
+class e extends Klasa { int f; { void g () {} int h (int i, int j[]) int l, m[]; double n; { n++; n--;} } }
+abstract class o extends Klasa { int p, q; double r[]; { void s () {} int t (int u, int v[]) int w, x[]; { y++; y--;} 
+	abstract void z (int a2, int b2[]); abstract int c2(); } }
+enum d2 { e2 = 3, f2 }
+{
+	//neki random komentar
+	int g2() {
+		h2[k2 + k3 * k4] = i2.j2.length;
+		l2(m2, n2);
+		if (- x1 + k1 - j1 * t1 / h1 % i1() *j1(x1 + y1, z1) * 89 * false / new int % new double[a1 * b1] * (a1 - b1) && y1 < z1 || x2 > z3 && y2 && y3 || x3) p2 = q2; else r2 = s2;
+		break;
+		continue;
+		return;
+		return c1;
+		read(d1);
+		print(f1, 8, 9, 10);
+		switch(t1) {
+			case 7: l1++;
+			case 8: l1--;
+		}
+		for(i1 = 0; o1;i1++) l1++;
+		{ 
+			l1++;
+			l1--;
+		}
+		l2();
+		print(- x1 > y2 && false || x2 > y1 && true?8:9);
+	}
+}

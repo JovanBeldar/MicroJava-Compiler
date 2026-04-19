@@ -1,0 +1,454 @@
+package rs.ac.bg.etf.pp1;
+
+import java_cup.runtime.*;
+import org.apache.log4j.*;
+
+// import java.io.*;
+import rs.ac.bg.etf.pp1.ast.*;
+
+
+parser code {:
+	
+	boolean errorDetected = false;
+	
+	Logger log = Logger.getLogger(getClass());
+   
+   
+    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
+     
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+      done_parsing();
+      report_error(message, info);
+    }
+  
+    public void syntax_error(Symbol cur_token) {
+        report_error("\nSintaksna greska", cur_token);
+    }
+  
+    public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+        report_fatal_error("Fatalna greska, parsiranje se ne moze nastaviti", cur_token);
+    }
+
+    public void report_error(String message, Object info) {
+    	errorDetected = true;
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol)
+            msg.append (" na liniji ").append(((Symbol)info).left);
+        log.error(msg.toString());
+    }
+    
+    public void report_info(String message, Object info) {
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol)
+            msg.append (" na liniji ").append(((Symbol)info).left);
+        log.info(msg.toString());
+    }
+    
+:}
+
+scan with {:
+	Symbol s = this.getScanner().next_token();
+	if (s != null && s.value != null) 
+		log.info(s.toString() + " " + s.value.toString());
+	return s;
+:}
+
+
+terminal PROGRAM, LBRACE, RBRACE, CONST, SEMICOLON, COMMA, EQUAL, LSQUARE;
+terminal RSQUARE, CLASS, EXTENDS, ENUM, ABSTRACT, LPAREN, RPAREN, VOID, /* Statement deo */IF, ELSE, BREAK, CONTINUE, RETURN, READ, PRINT;
+terminal SWITCH, FOR, CASE, COLON, INCREMENT, DECREMENT, OR, AND, MINUS, QUESTION_MARK, NEW, DOT, LENGTH, EQUAL_EQUAL;
+terminal NOT_EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, PLUS, ASTERISK, SLASH, PERCENT;
+terminal Integer NUMBER, BOOLEAN;
+terminal Character CHARACTER;
+terminal String IDENTIFIER;
+
+nonterminal Prog, ProgDeclList, MethDeclList, ProgDeclPart, ConstDecl, VarDecl, ClassDecl, EnumDecl, AbstractClassDecl;
+nonterminal ConstDeclList, ConstDeclPart, ConstDeclType, VarDeclList, VarDeclPart, ListOfVarDeclarations, EnumDeclList;
+nonterminal EnumDeclPart, AbstractClassList, AbstractClassListPart, MethodDecl, AbstractMethodDecl, FormalParameters; 
+nonterminal FormPars, ListOfStatements, Statement, FormParsPart, /* Statement deo */ DesignatorStatement, NumberPrint;
+nonterminal CaseList, CaseListPart, Assignop, ActPars, Relop, Addop;
+nonterminal Mulop, ElseStatement;
+nonterminal IfCondition, GlobalVarDecl, GlobalVarDeclList, GlobalVarDeclPart, DesignatorStatementUpdate;
+nonterminal ProgName;
+nonterminal EnumDeclName;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Factor, FactorList, Term, TermList, ExprNoCond, Expr, AssignmentError;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorArrayName, MethodTypeName;
+nonterminal ForNonTerm, SwitchNonTerm;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Condition, CondTerm, CondFact, ConditionalExpr, Type;
+nonterminal ActParDummyBegin, ActParList, ActPar;
+nonterminal OrNonTerm;
+nonterminal ElseDummy;
+nonterminal ForInit, ForCond, ForUpdate, ForFirstSemicolon, ForSecondSemicolon, ForRparen;
+nonterminal CaseDummy, NumberDummy;
+nonterminal TernaryColon;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj LengthDummy;
+
+precedence left ELSE;
+
+Prog ::= (Program) PROGRAM ProgName ProgDeclList LBRACE MethDeclList RBRACE;
+
+ProgName ::= (ProgName) IDENTIFIER;
+
+ProgDeclList ::= (ProgDecls) ProgDeclList ProgDeclPart 
+				|
+				(NoProgDecls) /* epsilon */
+				;
+
+ProgDeclPart ::= (ProgConstDeclaration) ConstDecl
+				|
+				(ProgVarDeclaration) GlobalVarDecl
+				|
+				(ProgClassDeclaration) ClassDecl
+				|
+				(ProgEnumDeclaration) EnumDecl
+				|
+				(ProgAbstractClassDeclaration) AbstractClassDecl
+				;
+				
+ConstDecl ::= (ConstDecl) CONST Type ConstDeclList SEMICOLON;
+
+ConstDeclList ::= (ConstDeclarationList) ConstDeclList COMMA ConstDeclPart
+				|
+				(ConstDeclarationPart) ConstDeclPart
+				;
+				
+ConstDeclPart ::= (ConstDeclPart) IDENTIFIER EQUAL ConstDeclType;
+
+ConstDeclType ::= (ConstDeclNum) NUMBER
+				|
+				(ConstDeclChar) CHARACTER
+				|
+				(ConstDeclBool) BOOLEAN
+				;
+				
+GlobalVarDecl ::= (GlobalVarDecl) Type GlobalVarDeclList SEMICOLON;
+
+GlobalVarDeclList ::= (GlobalVarDeclarationList) GlobalVarDeclList COMMA GlobalVarDeclPart
+				|
+				(GlobalVarDeclarationPart) GlobalVarDeclPart
+				;		
+
+GlobalVarDeclPart ::= (GlobalVarDeclPartNoSquare) IDENTIFIER
+				|
+				(GlobalVarDeclPartSquare) IDENTIFIER LSQUARE RSQUARE
+				|
+				error:e
+				{: parser.report_error("Error on the line: " + eleft + " Global variable declaration faulty!", null); :}
+				;
+
+VarDecl ::= (VarDecl) Type VarDeclList SEMICOLON;
+
+VarDeclList ::= (VarDeclarationList) VarDeclList COMMA VarDeclPart
+				|
+				(VarDeclarationPart) VarDeclPart
+				;
+				
+VarDeclPart ::= (VarDeclPartNoSquare) IDENTIFIER
+				|
+				(VarDeclPartSquare) IDENTIFIER LSQUARE RSQUARE
+				;
+				
+ClassDecl ::= (ClassDeclNoExtNoMeth) CLASS IDENTIFIER LBRACE ListOfVarDeclarations RBRACE
+				|
+				(ClassDeclNoExtMeth) CLASS IDENTIFIER LBRACE ListOfVarDeclarations LBRACE MethDeclList RBRACE RBRACE
+				|
+				(ClassDeclExtNoMeth) CLASS IDENTIFIER EXTENDS Type LBRACE ListOfVarDeclarations RBRACE
+				|
+				(ClassDeclExtMeth) CLASS IDENTIFIER EXTENDS Type LBRACE ListOfVarDeclarations LBRACE MethDeclList RBRACE RBRACE
+				;
+				
+ListOfVarDeclarations ::= (ListOfVarDeclarationss) ListOfVarDeclarations VarDecl
+				|
+				(NoVarDeclaration) /* epsilon */
+				;
+				
+EnumDecl ::= (EnumDecl) ENUM EnumDeclName LBRACE EnumDeclList RBRACE;
+
+EnumDeclName ::= (EnumDeclName) IDENTIFIER;
+
+EnumDeclList ::= (EnumDeclListt) EnumDeclList COMMA EnumDeclPart
+				|
+				(EnumDeclarationPart) EnumDeclPart
+				;
+				
+EnumDeclPart ::= (EnumDeclPartNoEqual) IDENTIFIER
+				|
+				(EnumDeclPartEqual) IDENTIFIER EQUAL NUMBER
+				;
+				
+AbstractClassDecl ::= (AbstrClassDeclNoExtNoList) ABSTRACT CLASS IDENTIFIER LBRACE ListOfVarDeclarations RBRACE
+				|
+				(AbstrClassDeclNoExtList) ABSTRACT CLASS IDENTIFIER LBRACE ListOfVarDeclarations LBRACE AbstractClassList RBRACE RBRACE
+				|
+				(AbstrClassDeclExtNoList) ABSTRACT CLASS IDENTIFIER EXTENDS Type LBRACE ListOfVarDeclarations RBRACE
+				|
+				(AbstrClassDEclExtList) ABSTRACT CLASS IDENTIFIER EXTENDS Type LBRACE ListOfVarDeclarations LBRACE AbstractClassList RBRACE RBRACE
+				;
+				
+AbstractClassList ::= (AbstractClassListt) AbstractClassList AbstractClassListPart
+				|
+				(NoAbstractClassListPart) /* epsilon */
+				;
+
+AbstractClassListPart ::= (AbstrClassMethDecl) MethodDecl
+				|
+				(AbstrClassAbstrMethDecl) AbstractMethodDecl SEMICOLON
+				;
+				
+AbstractMethodDecl ::= (AbstrMethodType) ABSTRACT Type IDENTIFIER LPAREN FormalParameters RPAREN
+				|
+				(AbstrMethodVoid) ABSTRACT VOID IDENTIFIER LPAREN FormalParameters RPAREN
+				;
+				
+FormalParameters ::= (FormalParameterss) FormPars
+				|
+				(NoFormalParameters) /* epsilon */
+				;
+
+MethDeclList ::= (MethDeclListt) MethDeclList MethodDecl
+				|
+				(NoMethodDeclarations) /* epsilon */
+				;
+				
+MethodDecl ::= (MethodDecl) MethodTypeName LPAREN FormalParameters RPAREN ListOfVarDeclarations LBRACE ListOfStatements RBRACE;
+
+MethodTypeName ::= (MethTypeName) Type IDENTIFIER
+				|
+				(MethVoidName) VOID IDENTIFIER;
+
+ListOfStatements ::= (ListOfStatementss) ListOfStatements Statement
+				|
+				(NoStatements) /* epsilon */
+				;
+
+FormPars ::= (FormParss) FormPars COMMA FormParsPart
+				|
+				(FormalParameterPart) FormParsPart
+				;
+
+FormParsPart ::= (FormParsPartNoSquare) Type IDENTIFIER
+				|
+				(FormParsPartSquare) Type IDENTIFIER LSQUARE RSQUARE
+				|
+				error:e
+				{: parser.report_error("Error on the line: " + eleft + " Faulty formal parameter declaration!", null); :}
+				;
+				
+Type ::= (Type) IDENTIFIER;
+
+Statement ::= (StatementDesignatedStmt) DesignatorStatement SEMICOLON
+				|
+				(StatementIfElse) IF LPAREN IfCondition RPAREN Statement ElseStatement
+				|
+				(StatementBreak) BREAK SEMICOLON
+				|
+				(StatementContinue) CONTINUE SEMICOLON
+				|
+				(StatementReturnNoExpr) RETURN SEMICOLON
+				|
+				(StatementReturnExpr) RETURN Expr SEMICOLON
+				|
+				(StatementRead) READ LPAREN Designator RPAREN SEMICOLON
+				|
+				(StatementPrint) PRINT LPAREN Expr NumberPrint RPAREN SEMICOLON
+				|
+				(StatementSwitch) SwitchNonTerm LPAREN Expr RPAREN LBRACE CaseList RBRACE
+				|
+				(StatementFor) ForNonTerm LPAREN ForInit ForFirstSemicolon ForCond ForSecondSemicolon ForUpdate ForRparen Statement
+				|
+				(StatementBlock) LBRACE ListOfStatements RBRACE
+				;
+				
+ForFirstSemicolon ::= (ForFirstSemicolon) SEMICOLON;
+				
+ForSecondSemicolon ::= (ForSecondSemicolon) SEMICOLON;
+
+ForRparen ::= (ForRparen) RPAREN;
+				
+ForInit ::= (ForInitt) DesignatorStatement
+				|
+				(NoForInit) /* epsilon */
+				;
+
+ForCond ::= (ForCondd) Condition
+				|
+				(NoForCond) /* epsilon */
+				;
+
+ForUpdate ::= (ForUpdatee) DesignatorStatementUpdate
+				|
+				(NoForUpdate) /* epsilon */
+				;
+
+ElseStatement ::= (ElseStmt) ElseDummy Statement
+				|
+				(NoElseStmt) /* epsilon */
+				;
+
+ElseDummy ::= (ElseDummy) ELSE;
+				
+ForNonTerm ::= (ForNonTerm) FOR;
+
+SwitchNonTerm ::= (SwitchNonTerm) SWITCH;
+				
+IfCondition ::= (IfCond) Condition
+				|
+				error:e
+				{: parser.report_error("Error on the line: " + eleft + " Condition for if construction faulty!" , null); :}
+				;				
+				
+NumberPrint ::= (NumberPrintt) COMMA NUMBER
+				|
+				(NoNumberPrint) /* epsilon */
+				;
+
+CaseList ::= (CaseListt) CaseList CaseListPart
+				|
+				(NoCaseList) /* epsilon */
+				;
+				
+CaseListPart ::= (CaseListPart) CaseDummy NumberDummy COLON ListOfStatements;
+
+CaseDummy ::= (CaseDummy) CASE;
+
+NumberDummy ::= (NumberDummy) NUMBER;
+
+DesignatorStatement ::= (DesignatorStatementAssign) Designator Assignop AssignmentError
+				|
+				(DesignatorStatementNoActPars) Designator LPAREN RPAREN
+				|
+				(DesignatorStatementActPars) Designator LPAREN ActPars RPAREN
+				|
+				(DesignatorStatementInc) Designator INCREMENT
+				|
+				(DesignatorStatementDec) Designator DECREMENT
+				;
+				
+AssignmentError ::= (AssignNoError) Expr
+				|
+				error:e
+				{: parser.report_error("Error on the line: " + eleft + " Faulty assignment expression!", null); :}
+				;							
+				
+DesignatorStatementUpdate ::= (DesignatorStatementAssignUpdate) Designator Assignop Expr
+				|
+				(DesignatorStatementNoActParsUpdate) Designator LPAREN RPAREN
+				|
+				(DesignatorStatementActParsUpdate) Designator LPAREN ActPars RPAREN
+				|
+				(DesignatorStatementIncUpdate) Designator INCREMENT
+				|
+				(DesignatorStatementDecUpdate) Designator DECREMENT
+				;				
+				
+ActPars ::= (ActPars) ActParDummyBegin ActPar ActParList;
+
+ActParDummyBegin ::= (ActParDummyBegin) /* epsilon */;
+
+ActParList ::= (ActParListt) COMMA ActPar ActParList
+				|
+				(ActParListEmpty) /* epsilon */
+				;
+				
+ActPar ::= (ActPar) Expr;
+
+Condition ::= (Conditionn) Condition OrNonTerm CondTerm
+				|
+				(ConditionCondTerm) CondTerm
+				;
+				
+OrNonTerm ::= (OrNonTerm) OR;				
+				
+CondTerm ::= (CondTermm) CondTerm AND CondFact
+				|
+				(CondTermCondFact) CondFact
+				;
+
+CondFact ::= (CondFactt) ExprNoCond Relop ExprNoCond
+				|
+				(CondFactExpr) ExprNoCond
+				;
+				
+Expr ::= (ExprCond) ConditionalExpr
+				|
+				(ExprNoConditional) ExprNoCond
+				;
+
+ConditionalExpr ::= (ExprCondOr) Condition QUESTION_MARK Expr TernaryColon Expr;
+
+TernaryColon ::= (TernaryColon) COLON;
+
+ExprNoCond ::= (ExprNoCond) TermList;
+
+TermList ::= (TermListt) TermList Addop Term
+				|
+				(TermListPartNoMinus) Term
+				|
+				(TermListPartMinus) MINUS Term
+				;
+
+Term ::= (Term) FactorList;
+
+FactorList ::= (FactorListt) FactorList Mulop Factor
+				|
+				(FactorListPart) Factor
+				;
+				
+Factor ::= (FactorVariableReference) Designator
+				|
+				(FactorFunctionCallNoActPars) Designator LPAREN RPAREN
+				|
+				(FactorFunctionCallActPars) Designator LPAREN ActPars RPAREN
+				|
+				(FactorNumber) NUMBER
+				|
+				(FactorChar) CHARACTER
+				|
+				(FactorBool) BOOLEAN
+				|
+				(FactorNewNoExpr) NEW Type
+				|
+				(FactorNewExpr) NEW Type LSQUARE Expr RSQUARE
+				|
+				(FactorParenthesis) LPAREN Expr RPAREN
+				;
+				
+Designator ::= (DesignatorVar) IDENTIFIER
+				|
+				(DesignatorEnum) IDENTIFIER DOT IDENTIFIER
+				|
+				(DesignatorLength) IDENTIFIER DOT LengthDummy
+				|
+				(DesignatorArray) DesignatorArrayName LSQUARE Expr RSQUARE
+				;
+				
+LengthDummy ::= (LengthDummy) LENGTH;
+				
+DesignatorArrayName ::= (DesignatorArrayName) IDENTIFIER;				
+				
+Assignop ::= (Assignopp) EQUAL;
+
+Relop ::= (RelopEqEq) EQUAL_EQUAL
+				|
+				(RelopNotEq) NOT_EQUAL
+				|
+				(RelopGr) GREATER
+				|
+				(RelopGrEq) GREATER_EQUAL
+				|
+				(RelopLe) LESS
+				|
+				(RelopLeEq) LESS_EQUAL
+				;
+				
+Addop ::= (AddopPl) PLUS
+				|
+				(AddopMi) MINUS
+				;
+				
+Mulop ::= (MulopAs) ASTERISK
+				|
+				(MulopSl) SLASH
+				|
+				(MulopPe) PERCENT
+				;

@@ -1,0 +1,11 @@
+program abc
+
+{
+	void main() int a[]; {
+		a = new int[2];
+		print(a.length);
+		print(eol);
+		print(len(a));
+	}
+
+}

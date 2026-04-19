@@ -1,0 +1,41 @@
+# Compiled Java files
+*.class
+
+# Logs
+logs/
+*.log
+
+# Build output (Ant, general)
+bin/
+build/
+out/
+dist/
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Eclipse-specific
+.metadata/
+.settings/
+.project
+.classpath
+.recommenders/
+
+# IntelliJ (just in case)
+.idea/
+*.iml
+
+# VS Code (optional)
+.vscode/
+
+# Remote systems temp (you mentioned this earlier)
+RemoteSystemsTempFiles/
+
+# JRE system files (not needed in repo)
+JRE System Library/

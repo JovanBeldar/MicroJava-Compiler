@@ -1,0 +1,74 @@
+program myTest
+
+const int a = 5;
+int b, c[];
+enum enm { a = 3, b}
+
+{
+	int getA() {
+		return a;
+	}
+
+	void main() int i, j; {
+		b = 3;
+		c = new int[13];
+		c[2] = 2;
+		getA();
+		b++;
+		print(getA() + 2 * b - c[2]);
+		print('a');
+		if(b==4) {
+			print('c');
+		} else {
+			print('d');
+		}
+		print('e');
+		
+		print(eol);
+		for(i = 0; i < 3; i++) {
+			if(i == 1) continue;
+			print(i);
+		}
+		print(eol);
+		switch(a) {
+			case 2: print('m');
+			case 7: print('j');
+			case 5: print('n');
+		}
+		print('e');
+		print(eol);
+		for(i = 0; i < 3; i++) {
+			print(8);
+			for(j = 0; j < 3; j++) {
+				if(j == 1) continue;
+				print(j);
+			}
+			if(i == 2) break;
+			print(7);
+		}
+		print('e');
+		print(eol);
+		print(chr(97));
+		print(eol);
+		print(enm.b);
+		print(eol);
+		print(c.length);
+		print(eol);
+		print(eol);
+		if(a < 4) {
+			if(a == 5) {
+				print(1);
+			} else {
+				print(2);
+			}
+		} else {
+			if(a == 5) {
+				print(3);
+			} else {
+				print(4);
+			}
+		}
+		print(eol);
+		print('e');
+	}
+}

@@ -1,0 +1,68 @@
+program A
+
+int glbA;
+enum e1 { a = 2, b }
+
+const int ca = 5;
+
+{
+	void main() int a; bool b; int d[]; e1 ea; {
+		if(a == 2 || b && false) a = 3;
+		print(ca > 4?2:d[5]);
+		switch(a + e1.a * ea) { 
+			case 4:
+				break;
+			case 3:
+				read(a);
+				switch(d[4]) {
+					case 4:
+						break;
+					case 5:
+						break;
+				}
+				break;
+			case 5:
+				for(; ; a++) {
+					read(a);
+					print(4, 2);
+					continue;
+					break;
+					d = new int[d[a]];
+					ea = e1.a;
+				}
+				break;
+		}
+		return;
+	}
+	
+	char f1(int a, int c, char b) {
+		return 'b';
+	}
+	
+	int f2(int c) int z[]; e1 u; bool r; {
+		c = z[e1.a];
+		z = new int[z.length];
+		c = e1.a + glbA;
+		u = e1.b;
+		read(u);
+		print(u);
+		return 3;
+	}
+	
+	int f3() char a; {
+		a = f1(2, f2(2), 'b');
+		f2(2);
+		if(3 == 2) print(a); else print(2);
+		return 3;
+	}
+	
+	char f4(e1 a) {
+		return 'b';
+	}
+	
+	void f5() char c; {
+		c = f4(e1.a);
+		if(1 > e1.a) read(c);
+		print(5 > 4 ? 21 : e1.b);
+	}
+}

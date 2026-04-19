@@ -1,0 +1,31 @@
+program ABC
+
+{
+	int getsomeint() {
+		return 5;
+	}
+	
+	void main() int a; int b; int c; {
+		a = 7;
+		b = a < 4 ? 3 : 2;
+		print(b);
+		read(c);
+		if(a < b && a > 3 || a > 11 || true) {
+			print('a');
+		}
+		print(c);
+		print(eol);
+		switch(a) {
+			case 2: print('a');
+			case 7: print('b');
+		}
+		
+		getsomeint();
+		print(eol);
+		switch(a) {
+			case 2: print(10);
+			case 7: print(20);
+			case 8: continue;
+		}
+	}
+}

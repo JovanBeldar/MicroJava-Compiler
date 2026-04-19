@@ -1,0 +1,35 @@
+program Test
+
+enum enm { a = 2, b = 5 }
+
+int glbInt;
+const int cnstInt = 1;
+char glbChr;
+const char cnstChr = 'a';
+bool glbBool;
+const bool cnstBool = true;
+enm glbEnm;
+
+int arrGlbInt[];
+char arrGlbChr[];
+bool arrGlbBool[];
+enm arrGlbEnm[];
+
+{
+	void main() int lclInt; char lclChr; bool lclBool; enm lclEnm; bool arrLclBool[]; {
+		//glbInt = 2 + cnstInt + lclInt;
+		//glbChr = cnstChr;
+		//glbBool = lclBool;
+		//glbEnm = lclEnm;
+		//arrGlbBool[6] = arrLclBool[3];
+	}
+	
+	int f1(int c, char b) int glbInt; {
+		return c + glbInt;
+	}
+	
+	void f2() {
+		for(;;f1(13, 'a')) print(2);
+		f1(3, 'b');
+	}
+}
