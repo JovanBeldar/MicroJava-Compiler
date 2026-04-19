@@ -3,7 +3,6 @@
 
 # Logs
 logs/
-*.log
 
 # Build output (Ant, general)
 bin/
@@ -27,15 +26,8 @@ Thumbs.db
 .classpath
 .recommenders/
 
-# IntelliJ (just in case)
-.idea/
-*.iml
-
-# VS Code (optional)
-.vscode/
-
-# Remote systems temp (you mentioned this earlier)
+# Remote systems temp
 RemoteSystemsTempFiles/
 
-# JRE system files (not needed in repo)
+# JRE system files
 JRE System Library/
