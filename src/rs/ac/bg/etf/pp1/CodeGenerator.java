@@ -47,7 +47,7 @@ public class CodeGenerator extends VisitorAdaptor {
 	private Stack<Integer> jumpToNextCaseStart = new Stack<>();
 	private Stack<Integer> jumpToNextCaseStatementStart = new Stack<>();
 	
-	private int skipTernary2nd;
+	private Stack<Integer> skipTernary2nd = new Stack<>();
 	
 	private Stack<List<Integer>> breakStack = new Stack<>();
 	
@@ -476,13 +476,13 @@ public class CodeGenerator extends VisitorAdaptor {
 	@Override
 	public void visit(TernaryColon ternaryColon) {
 		Code.putJump(0);
-		skipTernary2nd = Code.pc - 2;
+		skipTernary2nd.push(Code.pc - 2);
 		Code.fixup(skipThen.pop());
 	}
 	
 	@Override
 	public void visit(ExprCondOr exprCondOr) {
-		Code.fixup(skipTernary2nd);
+		Code.fixup(skipTernary2nd.pop());
 	}
 	
 	@Override
